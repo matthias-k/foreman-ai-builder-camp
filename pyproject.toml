@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "foreman"
+description = "Web UI for R3."
+authors = [
+    { name = "Matthias Tangemann", email = "matthias.tangemann@bethgelab.org" },
+]
+dependencies = [
+    "click~=8.1",
+    "executor~=23.2",
+    "flask~=3.0",
+    "pandas~=2.2",
+    "tensorboard~=2.16",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+dev = [
+    "ruff~=0.3"
+]
+
+[project.scripts]
+foreman = "foreman.cli:main"
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "FIX", "I", "T20"]
+
+[tool.setuptools]
+packages = ["foreman"]
+
+[[tool.mypy.overrides]]
+module = [
+    "executor.*",
+    "tensorboard.*",
+]
+ignore_missing_imports = true

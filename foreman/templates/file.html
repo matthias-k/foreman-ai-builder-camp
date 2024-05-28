@@ -1,0 +1,33 @@
+<div class="flex flex-col h-full">
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="flex flex-row text-gray-600 text-sm">
+        <li><a href="/" class="underline text-sky-600 hover:no-underline hover:text-sky-400">Jobs</a>&nbsp;/&nbsp;</li>
+        <li aria-current="page">
+            <a href="/jobs/{{ uuid }}" class="underline text-sky-600 hover:no-underline hover:text-sky-400">{{ uuid }}</a>&nbsp;/&nbsp;</li>
+        <li class="breadcrumb-item">files&nbsp;/&nbsp;</li>
+        <li class="breadcrumb-item active" aria-current="page">{{ path }}</li>
+    </ol>
+</nav>
+
+<pre id="file_content" style="width:0;height:0;overflow:hidden;">
+{{ content }}
+</pre>
+
+<div id="container" class="flex-1">
+</div>
+
+<script>
+    require.config({ paths: { vs: "https://unpkg.com/monaco-editor@0.44.0/min/vs" } });
+
+    require(["vs/editor/editor.main"], function () {
+        file_content = document.getElementById("file_content").innerText;
+
+        var editor = monaco.editor.create(document.getElementById("container"), {
+            value: file_content,
+            fontSize: 14,
+            language: "{{ language }}",
+            readOnly: {% if read_only %}true{% else %}false{% endif %}
+        });
+    });
+</script>
+</div>

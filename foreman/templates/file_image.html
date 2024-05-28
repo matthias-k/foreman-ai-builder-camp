@@ -1,0 +1,11 @@
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="flex flex-row text-gray-600 text-sm">
+        <li><a href="/" class="underline text-sky-600 hover:no-underline hover:text-sky-400">Jobs</a>&nbsp;/&nbsp;</li>
+        <li aria-current="page">
+            <a href="/jobs/{{ uuid }}" class="underline text-sky-600 hover:no-underline hover:text-sky-400">{{ uuid }}</a>&nbsp;/&nbsp;</li>
+        <li class="breadcrumb-item">files&nbsp;/&nbsp;</li>
+        <li class="breadcrumb-item active" aria-current="page">{{ path }}</li>
+    </ol>
+</nav>
+
+<img src="data:image/png;base64,{{ content }}">

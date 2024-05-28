@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block contents %}
+<div class="container-fluid p-3">
+    <div class="row">
+        <table id="fairshare" class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Group</th>
+                    <th>User</th>
+                    <th>Fairshare</th>
+                    <th>RUNINNG</th>
+                    <th>PENDING</th>
+                    <th>GPU_RUNINNG</th>
+                    <th>GPU_PENDING</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for rank, entry in data %}
+                <tr {% if entry.User=="mtangemann" %}class="table-primary" {% endif %}>
+                    <td>{{ rank+1 }}</td>
+                    <td>{{ entry.Account }}</td>
+                    <td>{{ entry.User }}</td>
+                    <td>{{ entry.FairShare }}</td>
+                    <td>{{ entry.RUNNING }}</td>
+                    <td>{{ entry.PENDING }}</td>
+                    <td>{{ entry.GPU_RUNNING }}</td>
+                    <td>{{ entry.GPU_PENDING }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#fairshare').DataTable({
+            "order": [[0, 'asc']],
+            "paging": false,
+        });
+    });
+</script>
+{% endblock %}

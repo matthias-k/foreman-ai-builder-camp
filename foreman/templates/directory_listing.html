@@ -1,0 +1,14 @@
+{% if not is_root %}
+v {{ name }}
+{% endif %}
+<ul>
+    {% for entry in entries %}
+    <li class="ml-2">
+        {% if entry.is_dir %}
+        &gt; <a hx-get="{{ entry.url }}" hx-target="closest li" class="underline text-sky-600 hover:no-underline hover:text-sky-400">{{ entry.name }}</a>
+        {% else %}
+        <a hx-get="{{ entry.url }}" hx-target="#contents" class="underline text-sky-600 hover:no-underline hover:text-sky-400">{{ entry.name }}</a>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>

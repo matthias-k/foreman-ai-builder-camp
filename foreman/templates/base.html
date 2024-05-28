@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Foreman</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
+
+    <!-- TODO Including Tailwind from the CDN is discouraged for production. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <div class="flex flex-col h-screen">
+        <nav class="flex flex-row z-50 w-full bg-white border-b border-gray-200">
+            <div class="w-64 p-4">
+                <a class="" href="/">👷 Foreman</a>
+            </div>
+            <ul class="flex-1 flex flex-row font-medium bg-white">
+                <li class="m-4">
+                    <a class="hover:text-sky-600" href="/">Jobs</a>
+                </li>
+                <li class="m-4">
+                    <a class="hover:text-sky-600" href="/browse">Browse
+                </li>
+                <li class="m-4">
+                    <a class="hover:text-sky-600" href="/search">Search</a>
+                </li>
+                <li class="m-4">
+                    <a class="hover:text-sky-600" href="/fairshare">Fairshare</a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="flex flex-row flex-1 overflow-y-auto bg-white">
+            {% block sidebar %}{% endblock %}
+            <div id="contents" class="{% if self.sidebar() %}sm:ml-64{% endif %} flex-1 px-4 py-4 overflow-y-auto">
+                {% block contents %}{% endblock %}       
+            </div>
+        </main>
+    </div>
+
+    <script src="https://unpkg.com/htmx.org@1.9.9" integrity="sha384-QFjmbokDn2DjBjq+fM+8LUIVrAgqcNW2s0PjAxHETgRn9l4fvX31ZxDxvwQnyMOX" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script>
+</body>
+
+</html>
