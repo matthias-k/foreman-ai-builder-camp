@@ -1,3 +1,5 @@
+{% import "macros.html.jinja" as macros %}
+
 <table id="jobs" class="table-auto">
     <thead>
         <tr>
@@ -14,15 +16,7 @@
         <tr>
             <td class="font-monospace"><a href="/jobs/{{ job.id }}" class="underline text-sky-600 hover:no-underline hover:text-sky-400">{{ job.id }}</a></td>
             <td class="font-monospace">{{ job.timestamp.strftime("%Y-%m-%d %H:%M:%S") }}</td>
-            <td>
-                {% if job.status == "done" %}
-                <span class="px-2 py-1 rounded-md bg-lime-500 text-sm text-white">Done</span>
-                {% elif job.status == "running" %}
-                <span class="px-2 py-1 rounded-md bg-sky-500 text-sm text-white">Running</span>
-                {% elif job.status != "unknown" %}
-                <span class="px-2 py-1 rounded-md bg-amber-400 text-sm text-white">{{ job.status }}</span>
-                {% endif %}
-            </td>
+            <td>{{ macros.status(job.status) }}</td>
             <td>{% for tag in job.tags %}#{{ tag }} {% endfor %}</td>
             <td>
                 <button type="button" class="underline text-sky-600 hover:no-underline hover:text-sky-400"

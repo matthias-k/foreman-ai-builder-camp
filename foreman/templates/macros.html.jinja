@@ -1,0 +1,9 @@
+{% macro status(status) -%}
+    {% if status == "done" %}
+    <span class="px-2 py-1 rounded-md bg-lime-500 text-sm text-white">Done</span>
+    {% elif status == "running" %}
+    <span class="px-2 py-1 rounded-md bg-sky-500 text-sm text-white">Running</span>
+    {% elif status != "unknown" %}
+    <span class="px-2 py-1 rounded-md bg-amber-400 text-sm text-white">{{ status }}</span>
+    {% endif %}
+{%- endmacro %}
