@@ -10,25 +10,24 @@
     </thead>
 
     <tbody>
-        {% for uuid, entry in results.items() %}
+        {% for job in jobs %}
         <tr>
-            <td class="font-monospace"><a href="/jobs/{{ uuid }}" class="underline text-sky-600 hover:no-underline hover:text-sky-400">{{ uuid }}</a></td>
-            <td class="font-monospace">{{ entry.timestamp.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+            <td class="font-monospace"><a href="/jobs/{{ job.id }}" class="underline text-sky-600 hover:no-underline hover:text-sky-400">{{ job.id }}</a></td>
+            <td class="font-monospace">{{ job.timestamp.strftime("%Y-%m-%d %H:%M:%S") }}</td>
             <td>
-                {% if entry.status == "done" %}
+                {% if job.status == "done" %}
                 <span class="px-2 py-1 rounded-md bg-lime-500 text-sm text-white">Done</span>
-                {% elif entry.status == "running" %}
+                {% elif job.status == "running" %}
                 <span class="px-2 py-1 rounded-md bg-sky-500 text-sm text-white">Running</span>
-                {% elif entry.status != "unknown" %}
-                <span class="px-2 py-1 rounded-md bg-amber-400 text-sm text-white">{{ entry.status }}{% if entry.reason %} ({{ entry.reason
-                    }}){% endif %}</span>
+                {% elif job.status != "unknown" %}
+                <span class="px-2 py-1 rounded-md bg-amber-400 text-sm text-white">{{ job.status }}</span>
                 {% endif %}
             </td>
-            <td>{% for tag in entry.tags %}#{{ tag }} {% endfor %}</td>
+            <td>{% for tag in job.tags %}#{{ tag }} {% endfor %}</td>
             <td>
                 <button type="button" class="underline text-sky-600 hover:no-underline hover:text-sky-400"
-                    onclick="navigator.clipboard.writeText('{{ entry.path }}')">Copy Path</button>
-                <a href="/tensorboard/open/{{ uuid }}" target="_blank"
+                    onclick="navigator.clipboard.writeText('{{ job.path }}')">Copy Path</button>
+                <a href="/tensorboard/open/{{ job.id }}" target="_blank"
                     class="underline text-sky-600 hover:no-underline hover:text-sky-400">Tensorboard</a>
             </td>
         </tr>

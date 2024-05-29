@@ -15,19 +15,19 @@
 
 <section class="mb-12">
     <h1 class="text-2xl mt-4 mb-8">
-        {{ job.metadata.get("title", job.id) }}
+        {{ job.name or job.id}}
     
-        {% if status == "done" %}
+        {% if job.status == "done" %}
         <span class="ml-3 align-[4px] px-2 py-1 rounded-md bg-lime-500 text-sm text-white">Done</span>
-        {% elif status == "running" %}
+        {% elif job.status == "running" %}
         <span class="ml-3 align-[4px] px-2 py-1 rounded-md bg-sky-500 text-sm text-white">Running</span>
         {% else %}
-        <span class="ml-3 align-[4px] px-2 py-1 rounded-md bg-amber-400 text-sm text-white">{{ status }}</span>
+        <span class="ml-3 align-[4px] px-2 py-1 rounded-md bg-amber-400 text-sm text-white">{{ job.status }}</span>
         {% endif %}
     </h1>
 
-    {% if job.metadata.description %}
-        <p>{{ job.metadata.description }}</p>
+    {% if job.description %}
+        <p>{{ job.description }}</p>
     {% endif %}
 </section>
 
@@ -49,13 +49,13 @@
                 <th class="align-top px-6 py-3 text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">Tags</th>
                 <td class="align-top px-6 py-3">
                     <ul class="list-unstyled">
-                        {% for tag in job.metadata.tags %}<li>{{ tag }}</li>{% endfor %}
+                        {% for tag in job.tags %}<li>{{ tag }}</li>{% endfor %}
                     </ul>
                 </td>
             </tr>
             <tr>
                 <th class="align-top px-6 py-3 text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">Origin</th>
-                <td class="align-top px-6 py-3">{{ job.metadata.origin }}</td>
+                <td class="align-top px-6 py-3">{{ job.origin }}</td>
             </tr>
         </tbody>
     </table>
