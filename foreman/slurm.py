@@ -30,7 +30,7 @@ def _get_slurm_jobs_from_host(host: str) -> Dict[str, str]:
         return {}
 
     jobs = {}
-    for line in command.stdout.splitlines():
+    for line in command.output.splitlines()[1:]:
         job_id, status = line.split()
         jobs[job_id] = status
 
