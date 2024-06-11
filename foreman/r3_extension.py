@@ -59,8 +59,13 @@ class Job:
 
     def _get_status(self) -> str:
         if (self.path / "output" / "done").exists():
-            return "done"
-        
+            with open(self.path / "output" / "done") as file:
+                status = file.read().strip()
+            if len(status) > 0:
+                return status
+            else:
+                return "done"
+
         slurm_status = get_slurm_jobs().get(self.id, None)
         if slurm_status == "PENDING":
             return "queued"
