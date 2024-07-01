@@ -1,37 +1,62 @@
 """Provides additional job information for SLURM jobs."""
 
-from typing import Dict, Optional
-from flask import current_app
+import logging
+from typing import Dict
 
+import flask
+from diskcache import Cache
 from executor.ssh.client import ExternalCommandFailed, RemoteCommand
 
-_SLURM_CACHE: Optional[Dict[str, str]] = None
+LOGGER = logging.getLogger(__name__)
+
+CACHE = Cache()
 
 
-def get_slurm_jobs() -> Dict[str, str]:
-    """Returns a dictionary of slurm jobs."""
-    global _SLURM_CACHE
+def get_slurm():
+    if "slurm" not in flask.g:
+        flask.g.slurm = Slurm(
+            flask.current_app.config["SLURM_HOSTS"],
+            cache_experiation=flask.current_app.config["SLURM_CACHE_EXPIRATION"],
+        )
 
-    if _SLURM_CACHE is None:
-        _SLURM_CACHE = {}
-        for host in current_app.config["SLURM_HOSTS"]:
-            _SLURM_CACHE.update(_get_slurm_jobs_from_host(host))
-
-    return _SLURM_CACHE
+    return flask.g.slurm
 
 
-def _get_slurm_jobs_from_host(host: str) -> Dict[str, str]:
-    """Returns a dictionary of slurm jobs from a host."""
-    command = RemoteCommand(host, r"squeue --me -o '%j %T'", capture=True)
+class Slurm:
+    """Provides additional information from SLURM."""
 
-    try:
-        command.start()
-    except ExternalCommandFailed:
-        return {}
+    def __init__(self, hosts: list[str], cache_experiation: int = 5) -> None:
+        self.hosts = hosts
+        self._cache_expiration = cache_experiation
 
-    jobs = {}
-    for line in command.output.splitlines()[1:]:
-        job_id, status = line.split()
-        jobs[job_id] = status
+        if cache_experiation > 0:
+            memoize = CACHE.memoize(expire=cache_experiation)
+            self._get_jobs_from_host = memoize(self._get_jobs_from_host)
 
-    return jobs
+    @property
+    def cache_experation(self) -> int:
+        return self._cache_expiration
+
+    def get_jobs(self) -> Dict[str, str]:
+        jobs = {}
+        for host in self.hosts:
+            jobs.update(self._get_jobs_from_host(host))
+        return jobs
+
+    def _get_jobs_from_host(self, host: str) -> Dict[str, str]:
+        """Returns a dictionary of slurm jobs from a host."""
+        LOGGER.info("Getting slurm jobs from %s.", host)
+
+        command = RemoteCommand(host, r"squeue --me -o '%j %T'", capture=True)
+
+        try:
+            command.start()
+        except ExternalCommandFailed:
+            return {}
+
+        jobs = {}
+        for line in command.output.splitlines()[1:]:
+            job_id, status = line.split()
+            jobs[job_id] = status
+
+        return jobs

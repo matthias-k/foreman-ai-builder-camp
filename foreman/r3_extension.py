@@ -7,7 +7,7 @@ from typing import Any, Dict, Iterable, Optional
 
 import r3
 
-from foreman.slurm import get_slurm_jobs
+from foreman.slurm import get_slurm
 
 
 class Job:
@@ -66,7 +66,8 @@ class Job:
             else:
                 return "done"
 
-        slurm_status = get_slurm_jobs().get(self.id, None)
+        slurm_jobs = get_slurm().get_jobs()
+        slurm_status = slurm_jobs.get(self.id, None)
         if slurm_status == "PENDING":
             return "queued"
         if slurm_status == "RUNNING":

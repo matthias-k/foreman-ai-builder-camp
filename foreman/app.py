@@ -1,5 +1,6 @@
 import base64
 import json
+import logging
 import os
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta
@@ -21,6 +22,8 @@ from foreman.r3_extension import Repository
 
 R3_REPOSITORY = Path(os.environ["R3_REPOSITORY"])
 SLURM_DATE_FORMAT = r"%Y-%m-%dT%H:%M:%S"
+
+logging.basicConfig(level=logging.INFO)
 
 app = Flask("app", template_folder=Path(__file__).parent / "templates")
 joint_app = DispatcherMiddleware(app)
