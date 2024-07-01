@@ -168,7 +168,7 @@ def _get_job_timeline(job: r3.Job):
 
                 if job_id not in events_by_slurm_job:
                     events_by_slurm_job[job_id] = [{
-                        "status": "pending",
+                        "status": "queued",
                         "datetime": datetime.strptime(submit, SLURM_DATE_FORMAT),
                         "reason": "submitted",
                     }]
@@ -180,7 +180,7 @@ def _get_job_timeline(job: r3.Job):
                         "reason": "",
                     })
                     events_by_slurm_job[job_id].append({
-                        "status": "pending",
+                        "status": "queued",
                         "datetime": datetime.strptime(end, SLURM_DATE_FORMAT),
                         "reason": "preempted",
                     })
