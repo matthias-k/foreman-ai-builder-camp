@@ -1,10 +1,10 @@
 """Provides additional job information for SLURM jobs."""
 
 from typing import Dict, Optional
+from flask import current_app
 
 from executor.ssh.client import ExternalCommandFailed, RemoteCommand
 
-_SLURM_HOSTS = ["slurm2", "galvani"]
 _SLURM_CACHE: Optional[Dict[str, str]] = None
 
 
@@ -14,9 +14,9 @@ def get_slurm_jobs() -> Dict[str, str]:
 
     if _SLURM_CACHE is None:
         _SLURM_CACHE = {}
-        for host in _SLURM_HOSTS:
+        for host in current_app.config["SLURM_HOSTS"]:
             _SLURM_CACHE.update(_get_slurm_jobs_from_host(host))
-            
+
     return _SLURM_CACHE
 
 

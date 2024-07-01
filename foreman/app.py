@@ -25,6 +25,8 @@ SLURM_DATE_FORMAT = r"%Y-%m-%dT%H:%M:%S"
 app = Flask("app", template_folder=Path(__file__).parent / "templates")
 joint_app = DispatcherMiddleware(app)
 
+app.config.from_object("foreman.config")
+
 
 @click.command()
 @click.option("--host", type=str, default="localhost")
