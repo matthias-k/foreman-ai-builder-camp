@@ -61,6 +61,13 @@ def job_details(id: str):
     return render_template("job_details.html", job=job, timeline=timeline)
 
 
+@app.route("/jobs/<id>/status")
+def job_status(id: str):
+    repository = Repository.from_environment()
+    job = repository.get(id)
+    return render_template("job_status.html.jinja", job=job)
+
+
 @app.route("/tensorboard/open/<uuid>")
 def open_in_tensorboard(uuid):
     keys_to_delete = [

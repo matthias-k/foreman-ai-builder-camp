@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 
-{% import "macros.html.jinja" as macros %}
-
 {% block contents %}
 <nav aria-label="breadcrumb" class="mb-4">
     <ol class="flex flex-row text-gray-600 text-sm">
@@ -50,7 +48,7 @@
             <td class="px-6 py-4 whitespace-nowrap">
                 {{ entry.timestamp.strftime("%Y-%m-%d %H:%M:%S") }}
             </td>
-            <td class="px-6 py-4">{{ macros.status(entry.status) }}</td>
+            <td class="px-6 py-4" hx-get="{{ url_for('job_status', id=entry.id) }}" hx-trigger="every 2s"></td>
             <td class="px-6 py-4 whitespace-nowrap">
                 <button type="button" class="underline text-sky-600 hover:no-underline hover:text-sky-400"
                     onclick="navigator.clipboard.writeText('{{ entry.path }}')">Copy Path</button>
