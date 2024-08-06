@@ -1,0 +1,9 @@
+{
+  "name": "foreman",
+  "version": "0.0.0",
+  "description": "Foreman JavaScript dependencies",
+  "author": "Matthias Tangemann",
+  "dependencies": {
+    "htmx.org": "^2.0.1"
+  }
+}

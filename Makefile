@@ -1,7 +1,11 @@
-.PHONY: fix lint lint/ruff lint/mypy test
+.PHONY: fix install lint lint/ruff lint/mypy test
 
 fix:
 	ruff check --fix .
+
+install:
+	pip install -e .
+	cd foreman/static && npm install
 
 lint: lint/ruff lint/mypy
 
