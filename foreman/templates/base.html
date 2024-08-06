@@ -5,7 +5,13 @@
 <head>
     <title>Foreman</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    
     <link rel="stylesheet" href="{{ url_for('static', filename='output.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/datatables.net-dt/css/dataTables.dataTables.min.css') }}" />
+
+    <!-- The Monaco Editor loader interferes with dataTables, so we have to include dataTables first -->
+    <script src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='node_modules/datatables.net/js/dataTables.js') }}"></script>   
     <script src="{{ url_for('static', filename='node_modules/htmx.org/dist/htmx.min.js') }}"></script>
     <script src="{{ url_for('static', filename='node_modules/monaco-editor/min/vs/loader.js') }}"></script>
 </head>
