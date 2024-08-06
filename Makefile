@@ -1,7 +1,12 @@
-.PHONY: fix lint lint/ruff lint/mypy test
+.PHONY: fix install lint lint/ruff lint/mypy test
 
 fix:
 	ruff check --fix .
+
+install:
+	pip install -e .
+	cd foreman/static && npm install
+	cd foreman/static && npx tailwindcss -i input.css -o output.css
 
 lint: lint/ruff lint/mypy
 

@@ -25,7 +25,11 @@ SLURM_DATE_FORMAT = r"%Y-%m-%dT%H:%M:%S"
 
 logging.basicConfig(level=logging.INFO)
 
-app = Flask("app", template_folder=Path(__file__).parent / "templates")
+app = Flask(
+    "app",
+    template_folder=Path(__file__).parent / "templates",
+    static_folder=Path(__file__).parent / "static",
+)
 joint_app = DispatcherMiddleware(app)
 
 app.config.from_object("foreman.config")
