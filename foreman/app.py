@@ -1,7 +1,8 @@
 import base64
 import json
+import logging
 import os
-from collections import Counter, OrderedDict, defaultdict
+from collections import Counter, defaultdict
 from datetime import datetime, timedelta
 from io import StringIO
 from pathlib import Path
@@ -17,12 +18,17 @@ from tensorboard.backend import application
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from werkzeug.serving import run_simple
 
+from foreman.r3_extension import Repository
+
 R3_REPOSITORY = Path(os.environ["R3_REPOSITORY"])
-DATE_FORMAT = r"%Y-%m-%d %H:%M:%S"
 SLURM_DATE_FORMAT = r"%Y-%m-%dT%H:%M:%S"
+
+logging.basicConfig(level=logging.INFO)
 
 app = Flask("app", template_folder=Path(__file__).parent / "templates")
 joint_app = DispatcherMiddleware(app)
+
+app.config.from_object("foreman.config")
 
 
 @click.command()
@@ -42,118 +48,24 @@ def main(host, port, debug):
 
 @app.route("/")
 def index():
-    repository = r3.Repository(R3_REPOSITORY)
-
-    jobs = {}
-    for job in repository.jobs():
-        jobs[job.id] = {
-            "id": job.id,
-            "timestamp": job.timestamp,
-            "name": job.metadata.get("name", ""),
-            "tags": job.metadata.get("tags", []),
-            "path": str(repository.path / "jobs" / job.id),
-            "virtual_path": job.metadata.get("path", ""),
-        }
-
-    _add_status_information(jobs)
-
-    sorted_uuids = sorted(
-        jobs.keys(), key=lambda uuid: jobs[uuid]["timestamp"], reverse=True
-    )
-    jobs = OrderedDict((uuid, jobs[uuid]) for uuid in sorted_uuids)
-
-    return render_template("jobs.html", r3_repository=R3_REPOSITORY, index=jobs)
+    repository = Repository.from_environment()
+    jobs = sorted(repository.jobs(), key=lambda job: job.timestamp, reverse=True)
+    return render_template("jobs.html", jobs=jobs)
 
 
-def _add_status_information(jobs):
-    for host in ["slurm2", "galvani"]:
-        command = RemoteCommand(host, r"squeue --me -o '%j %T %r'", capture=True)
-        try:
-            command.start()
-        except ExternalCommandFailed:
-            continue
-
-        active_jobs = dict()
-        for line in command.output.split("\n")[1:]:
-            if len(line) > 1:
-                name, state, reason = line.split(" ", maxsplit=2)
-                active_jobs[name] = (state, reason)
-
-        for uuid in jobs.keys():
-            done_file = R3_REPOSITORY / "jobs" / uuid / "output" / "done"
-            if done_file.exists():
-                jobs[uuid]["status"] = "done"
-
-            elif uuid in active_jobs:
-                status, reason = active_jobs[uuid]
-                if status.lower() == "running":
-                    jobs[uuid]["status"] = "running"
-                else:
-                    jobs[uuid]["status"] = status
-                    jobs[uuid]["reason"] = reason
-
-            else:
-                jobs[uuid]["status"] = "unknown"
+@app.route("/jobs/<id>")
+def job_details(id: str):
+    repository = Repository.from_environment()
+    job = repository.get(id)
+    timeline = _get_job_timeline(job.r3_job)
+    return render_template("job_details.html", job=job, timeline=timeline)
 
 
-def _add_status_information_2(jobs):
-    for host in ["slurm2", "galvani"]:
-        command = RemoteCommand(host, r"squeue --me -o '%j %T %r'", capture=True)
-        try:
-            command.start()
-        except ExternalCommandFailed:
-            continue
-
-        active_jobs = dict()
-        for line in command.output.split("\n")[1:]:
-            if len(line) > 1:
-                name, state, reason = line.split(" ", maxsplit=2)
-                active_jobs[name] = (state, reason)
-
-        for revisions in jobs.values():
-            for job in revisions:
-                done_file = R3_REPOSITORY / "jobs" / job["id"] / "output" / "done"
-                if done_file.exists():
-                    job["status"] = "done"
-
-                elif job["id"] in active_jobs:
-                    status, reason = active_jobs[job["id"]]
-                    if status.lower() == "running":
-                        job["status"] = "running"
-                    else:
-                        job["status"] = status
-                        job["reason"] = reason
-
-                else:
-                    job["status"] = "unknown"
-
-
-def _get_job_status_and_reason(job):
-    done_file = job.path / "output" / "done"
-    if done_file.exists():
-        return "done", None
-
-    for host in ["slurm2", "galvani"]:
-        command = RemoteCommand(host, r"squeue --me -o '%j %T %r'", capture=True)
-        try:
-            command.start()
-        except ExternalCommandFailed:
-            continue
-
-        active_jobs = dict()
-        for line in command.output.split("\n")[1:]:
-            if len(line) > 1:
-                name, state, reason = line.split(" ", maxsplit=2)
-                active_jobs[name] = (state, reason)
- 
-        if job.id in active_jobs:
-            status, reason = active_jobs[job.id]
-            if status.lower() == "running":
-                return "running", None
-            else:
-                return status, reason
-
-    return "unknown", None
+@app.route("/jobs/<id>/status")
+def job_status(id: str):
+    repository = Repository.from_environment()
+    job = repository.get(id)
+    return render_template("job_status.html.jinja", job=job)
 
 
 @app.route("/tensorboard/open/<uuid>")
@@ -242,25 +154,6 @@ def get_users_and_state():
     return user_state, user_gpus
 
 
-@app.route("/jobs/<uuid>")
-def job_details(uuid: str):
-    repository = r3.Repository(R3_REPOSITORY)
-    job = r3.Job(repository.path / "jobs" / uuid, uuid)
-    short_id = uuid.split("-")[0]
-
-    status, reason = _get_job_status_and_reason(job)
-    timeline = _get_job_timeline(job)
-
-    return render_template(
-        "job_details.html",
-        job=job,
-        short_id=short_id,
-        status=status,
-        reason=reason,
-        timeline=timeline,
-    )
-
-
 def _get_job_timeline(job: r3.Job):
     starttime = (job.timestamp.date() - timedelta(days=1)).isoformat()
  
@@ -287,7 +180,7 @@ def _get_job_timeline(job: r3.Job):
 
                 if job_id not in events_by_slurm_job:
                     events_by_slurm_job[job_id] = [{
-                        "status": "pending",
+                        "status": "queued",
                         "datetime": datetime.strptime(submit, SLURM_DATE_FORMAT),
                         "reason": "submitted",
                     }]
@@ -299,7 +192,7 @@ def _get_job_timeline(job: r3.Job):
                         "reason": "",
                     })
                     events_by_slurm_job[job_id].append({
-                        "status": "pending",
+                        "status": "queued",
                         "datetime": datetime.strptime(end, SLURM_DATE_FORMAT),
                         "reason": "preempted",
                     })
@@ -448,33 +341,16 @@ def search_post():
     except json.JSONDecodeError as error:
         return f"Invalid query: {query_str}, {error}"
 
-    repository = r3.Repository(R3_REPOSITORY)
-    jobs = repository.find(query)
+    repository = Repository.from_environment()
+    jobs = sorted(repository.find(query), key=lambda job: job.timestamp, reverse=True)
 
-    results = {}
-    for job in jobs:
-        results[job.id] = {
-            "id": job.id,
-            "timestamp": job.timestamp,
-            "name": job.metadata.get("name", ""),
-            "tags": job.metadata.get("tags", []),
-            "path": str(repository.path / "jobs" / job.id),
-        }
-
-    _add_status_information(results)
-
-    sorted_uuids = sorted(
-        results.keys(), key=lambda uuid: results[uuid]["timestamp"], reverse=True
-    )
-    jobs = OrderedDict((uuid, results[uuid]) for uuid in sorted_uuids)
-
-    return render_template("search_results.html", results=results)
+    return render_template("search_results.html", jobs=jobs)
 
 
 @app.route("/browse", defaults={"path": ""})
 @app.route("/browse/<path:path>")
 def browse(path):
-    repository = r3.Repository(R3_REPOSITORY)
+    repository = Repository.from_environment()
 
     if len(path) > 0 and path[-1] != "/":
         path += "/"
@@ -485,24 +361,16 @@ def browse(path):
     jobs = defaultdict(list)
 
     for job in all_jobs:
-        job_path = job.metadata["path"][len(path):]
+        job_path = job.virtual_path[len(path):]
         if "/" in job_path:
             name = job_path.split("/")[0]
             directories[name] = path + name
         else:
-            jobs[job_path].append({
-                "id": job.id,
-                "timestamp": job.timestamp,
-                "name": job.metadata.get("name", ""),
-                "tags": job.metadata.get("tags", []),
-                "path": str(repository.path / "jobs" / job.id),
-            })
+            jobs[job_path].append(job)
 
     for name in jobs.keys():
-        jobs[name] = sorted(jobs[name], key=lambda job: job["timestamp"], reverse=True)
+        jobs[name] = sorted(jobs[name], key=lambda job: job.timestamp, reverse=True)
 
-    _add_status_information_2(jobs)
-    
     jobs = { key: value for key, value in sorted(jobs.items()) }
     directories = { key: value for key, value in sorted(directories.items()) }
 
@@ -526,21 +394,9 @@ def browse(path):
 
 @app.route("/browse_revisions/<path:path>")
 def browse_revisions(path: str):
-    repository = r3.Repository(R3_REPOSITORY)
+    repository = Repository.from_environment()
     jobs = repository.find({ "path": path })
     jobs = sorted(jobs, key=lambda revision: revision.timestamp, reverse=True)
-
-    revisions = []
-    for job in jobs:
-        revisions.append({
-            "id": job.id,
-            "timestamp": job.timestamp,
-            "name": job.metadata.get("name", ""),
-            "tags": job.metadata.get("tags", []),
-            "path": str(repository.path / "jobs" / job.id),
-        })
-
-    _add_status_information_2({ "job": revisions })
 
     breadcrumbs = dict()
     if path != "":
@@ -552,7 +408,7 @@ def browse_revisions(path: str):
             breadcrumbs[name] = full_path
 
     return render_template(
-        "browse_revisions.html", breadcrumbs=breadcrumbs, revisions=revisions
+        "browse_revisions.html", breadcrumbs=breadcrumbs, revisions=jobs
     )
 
 

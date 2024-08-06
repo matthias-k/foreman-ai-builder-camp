@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% import "macros.html.jinja" as macros %}
+
 {% block sidebar %}
 {% include "job_details_sidebar.html.jinja" %}
 {% endblock %}
@@ -15,19 +17,12 @@
 
 <section class="mb-12">
     <h1 class="text-2xl mt-4 mb-8">
-        {{ job.metadata.get("title", job.id) }}
-    
-        {% if status == "done" %}
-        <span class="ml-3 align-[4px] px-2 py-1 rounded-md bg-lime-500 text-sm text-white">Done</span>
-        {% elif status == "running" %}
-        <span class="ml-3 align-[4px] px-2 py-1 rounded-md bg-sky-500 text-sm text-white">Running</span>
-        {% else %}
-        <span class="ml-3 align-[4px] px-2 py-1 rounded-md bg-amber-400 text-sm text-white">{{ status }}</span>
-        {% endif %}
+        {{ job.name or job.id}}
+        {{ macros.status(job.status) }}
     </h1>
 
-    {% if job.metadata.description %}
-        <p>{{ job.metadata.description }}</p>
+    {% if job.description %}
+        <p>{{ job.description }}</p>
     {% endif %}
 </section>
 
@@ -49,13 +44,13 @@
                 <th class="align-top px-6 py-3 text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">Tags</th>
                 <td class="align-top px-6 py-3">
                     <ul class="list-unstyled">
-                        {% for tag in job.metadata.tags %}<li>{{ tag }}</li>{% endfor %}
+                        {% for tag in job.tags %}<li>{{ tag }}</li>{% endfor %}
                     </ul>
                 </td>
             </tr>
             <tr>
                 <th class="align-top px-6 py-3 text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">Origin</th>
-                <td class="align-top px-6 py-3">{{ job.metadata.origin }}</td>
+                <td class="align-top px-6 py-3">{{ job.origin }}</td>
             </tr>
         </tbody>
     </table>
@@ -90,15 +85,7 @@
               </td>
               <td class="px-6 py-4">{{ event.datetime.strftime("%H:%M:%S") }}</td>
               <td class="px-6 py-4">{{ event.duration }}</td>
-              <td class="px-6 py-4">
-                  {% if event.status == "done" %}
-                  <span class="px-2 py-1 rounded-md bg-lime-500 text-sm text-white">Done</span>
-                  {% elif event.status == "running" %}
-                  <span class="px-2 py-1 rounded-md bg-sky-500 text-sm text-white">Running</span>
-                  {% elif event.status != "unknown" %}
-                  <span class="px-2 py-1 rounded-md bg-amber-400 text-sm text-white">{{ event.status }}</span>
-                  {% endif %}
-              </td>
+              <td class="px-6 py-4">{{ macros.status(event.status) }}</td>
               <td class="px-6 py-4">
                   {% if event.reason == "committed" %}
                       Job {{ short_id }} was committed to R3.
