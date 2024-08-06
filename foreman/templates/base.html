@@ -5,14 +5,9 @@
 <head>
     <title>Foreman</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='output.css') }}" />
     <script src="{{ url_for('static', filename='node_modules/htmx.org/dist/htmx.min.js') }}"></script>
     <script src="{{ url_for('static', filename='node_modules/monaco-editor/min/vs/loader.js') }}"></script>
-
-    <!-- TODO Including Tailwind from the CDN is discouraged for production. -->
-    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body>
