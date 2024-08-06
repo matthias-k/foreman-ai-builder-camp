@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
 
     <script src="{{ url_for('static', filename='node_modules/htmx.org/dist/htmx.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='node_modules/monaco-editor/min/vs/loader.js') }}"></script>
 
     <!-- TODO Including Tailwind from the CDN is discouraged for production. -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -43,8 +44,6 @@
             </div>
         </main>
     </div>
-
-    <script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script>
 </body>
 
 </html>
