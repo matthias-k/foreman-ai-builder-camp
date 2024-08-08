@@ -23,7 +23,7 @@ dev = [
 ]
 
 [project.scripts]
-foreman = "foreman.cli:main"
+foreman = "foreman.app:main"
 
 [tool.ruff.lint]
 select = ["B", "E", "F", "FIX", "I", "T20"]
