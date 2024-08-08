@@ -416,5 +416,54 @@ def browse_revisions(path: str):
     )
 
 
+@app.route("/browse_relocate_form/<path:path>")
+def browse_relocate_form(path):
+    return render_template("browse_relocate_form.html.jinja", path=path)
+
+
+@app.route("/browse_relocate", methods=["POST"])
+def browse_relocate():
+    source = request.form["source"]
+    destination = request.form["destination"]
+    merge_confirmed = request.form.get("merge_confirmed", False)
+
+    repository = Repository.from_environment()
+
+    affected_jobs = []
+
+    jobs = repository.find({ "path": source })
+    for job in jobs:
+        job.r3_job.metadata["path"] = destination
+        affected_jobs.append(job)
+
+    jobs = repository.find({ "path": { "$glob": f"{source}/*" } })
+    for job in jobs:
+        job.r3_job.metadata["path"] = f"{destination}/{job.virtual_path[len(source) + 1:]}"
+        affected_jobs.append(job)
+
+    conflicts = set()
+    for job in affected_jobs:
+        if repository.find({ "path": job.r3_job.metadata["path"] }):
+            conflicts.add(job.r3_job.metadata["path"])
+
+    redirect_to = "" if "/" not in source else source.rsplit("/", 1)[0]
+
+    if len(conflicts) > 0 and not merge_confirmed:
+        return render_template(
+            "browse_relocate_conflict.html.jinja",
+            source=source,
+            destination=destination,
+            conflicts=conflicts,
+            redirect_to=redirect_to,
+        )
+
+    for job in affected_jobs:
+        job.r3_job.save_metadata()
+        repository.r3_repository._index.remove(job.r3_job)
+        repository.r3_repository._index.add(job.r3_job)
+
+    return redirect(f"/browse/{redirect_to}")
+
+
 if __name__ == "__main__":
     main()
