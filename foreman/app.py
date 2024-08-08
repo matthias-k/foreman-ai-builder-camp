@@ -352,6 +352,7 @@ def search_post():
 
 
 @app.route("/browse", defaults={"path": ""})
+@app.route("/browse/", defaults={"path": ""})
 @app.route("/browse/<path:path>")
 def browse(path):
     repository = Repository.from_environment()
