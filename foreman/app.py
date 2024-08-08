@@ -416,5 +416,27 @@ def browse_revisions(path: str):
     )
 
 
+@app.route("/browse_relocate_form/<path:path>")
+def browse_relocate_form(path):
+    return render_template("browse_relocate_form.html.jinja", path=path)
+
+
+@app.route("/browse_relocate", methods=["POST"])
+def browse_relocate():
+    source = request.form["source"]
+    destination = request.form["destination"]
+
+    repository = Repository.from_environment()
+    jobs = repository.find({ "path": source })
+    for job in jobs:
+        job.r3_job.metadata["path"] = destination
+        job.r3_job.save_metadata()
+        repository.r3_repository._index.remove(job.r3_job)
+        repository.r3_repository._index.add(job.r3_job)
+
+    redirect_to = "" if "/" not in source else source.rsplit("/", 1)[0]
+    return redirect(f"/browse/{redirect_to}")
+
+
 if __name__ == "__main__":
     main()
