@@ -10,6 +10,9 @@ clean:
 	rm -rf .ruff_cache
 	rm -rf .pytest_cache
 
+css:
+	cd foreman/static && npx tailwindcss -i input.css -o output.css
+
 fix:
 	ruff check --fix .
 
