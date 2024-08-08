@@ -427,9 +427,17 @@ def browse_relocate():
     destination = request.form["destination"]
 
     repository = Repository.from_environment()
+
     jobs = repository.find({ "path": source })
     for job in jobs:
         job.r3_job.metadata["path"] = destination
+        job.r3_job.save_metadata()
+        repository.r3_repository._index.remove(job.r3_job)
+        repository.r3_repository._index.add(job.r3_job)
+
+    jobs = repository.find({ "path": { "$glob": f"{source}/*" } })
+    for job in jobs:
+        job.r3_job.metadata["path"] = f"{destination}/{job.virtual_path[len(source) + 1:]}"
         job.r3_job.save_metadata()
         repository.r3_repository._index.remove(job.r3_job)
         repository.r3_repository._index.add(job.r3_job)
