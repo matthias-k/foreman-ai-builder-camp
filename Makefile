@@ -1,4 +1,14 @@
-.PHONY: fix install lint lint/ruff lint/mypy test
+.PHONY: clean fix install lint lint/ruff lint/mypy test
+
+clean:
+	rm -rf build
+	rm -rf foreman.egg-info
+	rm -rf foreman/static/node_modules
+	rm -rf foreman/static/output.css
+	rm -rf foreman/__pycache__
+	rm -rf .mypy_cache
+	rm -rf .ruff_cache
+	rm -rf .pytest_cache
 
 fix:
 	ruff check --fix .
