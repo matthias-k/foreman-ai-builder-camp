@@ -2,7 +2,7 @@ import base64
 import json
 import logging
 import os
-from collections import Counter, defaultdict
+from collections import Counter
 from datetime import datetime, timedelta
 from io import StringIO
 from pathlib import Path
@@ -18,6 +18,7 @@ from tensorboard.backend import application
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from werkzeug.serving import run_simple
 
+from foreman.job_tree import job_tree
 from foreman.r3_extension import Repository
 
 R3_REPOSITORY = Path(os.environ["R3_REPOSITORY"])
@@ -30,6 +31,8 @@ app = Flask(
     template_folder=Path(__file__).parent / "templates",
     static_folder=Path(__file__).parent / "static",
 )
+app.register_blueprint(job_tree)
+
 joint_app = DispatcherMiddleware(app)
 
 app.config.from_object("foreman.config")
@@ -349,121 +352,6 @@ def search_post():
     jobs = sorted(repository.find(query), key=lambda job: job.timestamp, reverse=True)
 
     return render_template("search_results.html", jobs=jobs)
-
-
-@app.route("/browse", defaults={"path": ""})
-@app.route("/browse/", defaults={"path": ""})
-@app.route("/browse/<path:path>")
-def browse(path):
-    repository = Repository.from_environment()
-
-    if len(path) > 0 and path[-1] != "/":
-        path += "/"
-
-    all_jobs = repository.find({ "path": { "$glob": path + "*" } })
-
-    directories = dict()
-    jobs = defaultdict(list)
-
-    for job in all_jobs:
-        job_path = job.virtual_path[len(path):]
-        if "/" in job_path:
-            name = job_path.split("/")[0]
-            directories[name] = path + name
-        else:
-            jobs[job_path].append(job)
-
-    for name in jobs.keys():
-        jobs[name] = sorted(jobs[name], key=lambda job: job.timestamp, reverse=True)
-
-    jobs = { key: value for key, value in sorted(jobs.items()) }
-    directories = { key: value for key, value in sorted(directories.items()) }
-
-    breadcrumbs = dict()
-    if path != "":
-        full_path = ""
-        for name in path.split("/"):
-            if name == "":
-                continue
-            full_path += name + "/"
-            breadcrumbs[name] = full_path
-
-    return render_template(
-        "browse.html",
-        breadcrumbs=breadcrumbs,
-        jobs=jobs,
-        directories=directories,
-        path=path,
-    )
-
-
-@app.route("/browse_revisions/<path:path>")
-def browse_revisions(path: str):
-    repository = Repository.from_environment()
-    jobs = repository.find({ "path": path })
-    jobs = sorted(jobs, key=lambda revision: revision.timestamp, reverse=True)
-
-    breadcrumbs = dict()
-    if path != "":
-        full_path = ""
-        for name in path.split("/"):
-            if name == "":
-                continue
-            full_path += name + "/"
-            breadcrumbs[name] = full_path
-
-    return render_template(
-        "browse_revisions.html", breadcrumbs=breadcrumbs, revisions=jobs
-    )
-
-
-@app.route("/browse_relocate_form/<path:path>")
-def browse_relocate_form(path):
-    return render_template("browse_relocate_form.html.jinja", path=path)
-
-
-@app.route("/browse_relocate", methods=["POST"])
-def browse_relocate():
-    source = request.form["source"]
-    destination = request.form["destination"]
-    merge_confirmed = request.form.get("merge_confirmed", False)
-
-    repository = Repository.from_environment()
-
-    affected_jobs = []
-
-    jobs = repository.find({ "path": source })
-    for job in jobs:
-        job.r3_job.metadata["path"] = destination
-        affected_jobs.append(job)
-
-    jobs = repository.find({ "path": { "$glob": f"{source}/*" } })
-    for job in jobs:
-        job.r3_job.metadata["path"] = f"{destination}/{job.virtual_path[len(source) + 1:]}"
-        affected_jobs.append(job)
-
-    conflicts = set()
-    for job in affected_jobs:
-        if repository.find({ "path": job.r3_job.metadata["path"] }):
-            conflicts.add(job.r3_job.metadata["path"])
-
-    redirect_to = "" if "/" not in source else source.rsplit("/", 1)[0]
-
-    if len(conflicts) > 0 and not merge_confirmed:
-        return render_template(
-            "browse_relocate_conflict.html.jinja",
-            source=source,
-            destination=destination,
-            conflicts=conflicts,
-            redirect_to=redirect_to,
-        )
-
-    for job in affected_jobs:
-        job.r3_job.save_metadata()
-        repository.r3_repository._index.remove(job.r3_job)
-        repository.r3_repository._index.add(job.r3_job)
-
-    return redirect(f"/browse/{redirect_to}")
 
 
 if __name__ == "__main__":
