@@ -13,11 +13,12 @@ import r3
 import tensorboard
 from executor import ExternalCommandFailed
 from executor.ssh.client import RemoteCommand
-from flask import Flask, redirect, render_template, request, send_from_directory
+from flask import Flask, redirect, render_template, request, send_from_directory, url_for
 from tensorboard.backend import application
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from werkzeug.serving import run_simple
 
+from foreman.job_list import job_list
 from foreman.job_tree import job_tree
 from foreman.r3_extension import Repository
 
@@ -31,6 +32,7 @@ app = Flask(
     template_folder=Path(__file__).parent / "templates",
     static_folder=Path(__file__).parent / "static",
 )
+app.register_blueprint(job_list)
 app.register_blueprint(job_tree)
 
 joint_app = DispatcherMiddleware(app)
@@ -55,9 +57,7 @@ def main(host, port, debug):
 
 @app.route("/")
 def index():
-    repository = Repository.from_environment()
-    jobs = sorted(repository.jobs(), key=lambda job: job.timestamp, reverse=True)
-    return render_template("jobs.html", jobs=jobs)
+    return redirect(url_for("job_list.view"))
 
 
 @app.route("/jobs/<id>")
