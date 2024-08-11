@@ -82,7 +82,7 @@
                 ( <a href="{{ url_for('job_tree.view_revisions', path=entry[0].virtual_path) }}" class="underline text-sky-600 hover:no-underline hover:text-sky-400">{{ entry|length }} revisions</a> )
                 {% endif %}
             </td>
-            <td class="px-6 py-4" hx-get="{{ url_for('job_status', id=entry[0].id) }}" hx-trigger="every 2s"></td>
+            <td class="px-6 py-4" hx-get="{{ url_for('job.status', id=entry[0].id) }}" hx-trigger="every 2s"></td>
             <td class="px-6 py-4 whitespace-nowrap">
                 <button
                     hx-get="{{ url_for('job_tree.relocate_form', path=entry[0].virtual_path) }}"
