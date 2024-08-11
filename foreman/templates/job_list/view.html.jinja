@@ -17,7 +17,7 @@
     <tbody>
         {% for job in jobs %}
         <tr>
-            <td class="font-monospace"><a href="/jobs/{{ job.id }}" class="underline text-sky-600 hover:no-underline hover:text-sky-400">{{ job.id }}</a></td>
+            <td class="font-monospace"><a href="{{ url_for('job.view', id=job.id) }}" class="underline text-sky-600 hover:no-underline hover:text-sky-400">{{ job.id }}</a></td>
             <td class="font-monospace">{{ job.timestamp.strftime("%Y-%m-%d %H:%M:%S") }}</td>
             <td>{{ macros.status(job.status) }}</td>
             <td>
