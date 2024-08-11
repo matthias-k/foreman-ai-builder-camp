@@ -13,7 +13,7 @@
        </ul>
        <div class="pt-4 mt-4 space-y-2 font-medium border-t border-gray-200 dark:border-gray-700">
             <h2>Files</h2>
-           <section id="files" hx-trigger="load" hx-get="/jobs/{{ job.id }}/directory_listing/">
+           <section id="files" hx-trigger="load" hx-get="{{ url_for('job.view_directory', id=job.id) }}">
            </section>
         </div>
     </div>

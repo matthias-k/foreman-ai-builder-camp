@@ -72,7 +72,7 @@
         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 group/item hover:bg-gray-50">
             <td></td>
             <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" id="name-{{ entry[0].id }}">
-                <a href="/jobs/{{ entry[0].id }}" class="underline text-sky-600 hover:no-underline hover:text-sky-400">
+                <a href="{{ url_for('job.view', id=entry[0].id) }}" class="underline text-sky-600 hover:no-underline hover:text-sky-400">
                     {{ name }}
                 </a>
             </th>
