@@ -3,7 +3,7 @@
 {% block contents %}
 <h1>Search</h1>
 
-<form hx-post="/search" hx-target="#search-results">
+<form hx-post="{{ url_for('search.search_post') }}" hx-target="#search-results">
     <textarea id="query" name="query" class="border-2" cols="160" rows="10">{
     
 }</textarea>

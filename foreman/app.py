@@ -17,7 +17,7 @@ from werkzeug.serving import run_simple
 from foreman.job import job
 from foreman.job_list import job_list
 from foreman.job_tree import job_tree
-from foreman.r3_extension import Repository
+from foreman.search import search
 
 R3_REPOSITORY = Path(os.environ["R3_REPOSITORY"])
 
@@ -31,6 +31,7 @@ app = Flask(
 app.register_blueprint(job)
 app.register_blueprint(job_list)
 app.register_blueprint(job_tree)
+app.register_blueprint(search)
 
 joint_app = DispatcherMiddleware(app)
 
@@ -141,26 +142,6 @@ def get_users_and_state():
     user_state = {user: Counter(job_states) for user, job_states in user_jobs.items()}
     user_gpus = {user: Counter(gpu_states) for user, gpu_states in user_gpus.items()}
     return user_state, user_gpus
-
-
-
-@app.route("/search", methods=["GET"])
-def search():
-    return render_template("search.html")
-
-
-@app.route("/search", methods=["POST"])
-def search_post():
-    query_str = request.form["query"]
-    try:
-        query = json.loads(query_str)
-    except json.JSONDecodeError as error:
-        return f"Invalid query: {query_str}, {error}"
-
-    repository = Repository.from_environment()
-    jobs = sorted(repository.find(query), key=lambda job: job.timestamp, reverse=True)
-
-    return render_template("search_results.html", jobs=jobs)
 
 
 if __name__ == "__main__":

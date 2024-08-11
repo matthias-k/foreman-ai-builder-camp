@@ -14,7 +14,7 @@
     <tbody>
         {% for job in jobs %}
         <tr>
-            <td class="font-monospace"><a href="/jobs/{{ job.id }}" class="underline text-sky-600 hover:no-underline hover:text-sky-400">{{ job.id }}</a></td>
+            <td class="font-monospace"><a href="{{ url_for('job.view', id=job.id) }}" class="underline text-sky-600 hover:no-underline hover:text-sky-400">{{ job.id }}</a></td>
             <td class="font-monospace">{{ job.timestamp.strftime("%Y-%m-%d %H:%M:%S") }}</td>
             <td>{{ macros.status(job.status) }}</td>
             <td>{% for tag in job.tags %}#{{ tag }} {% endfor %}</td>
@@ -29,8 +29,6 @@
     </tbody>
 </table>
 
-<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
 <script>
     $(document).ready(function () {
         $('#jobs').DataTable({
