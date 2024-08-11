@@ -5,10 +5,9 @@ using this virtual directory structure.
 """
 from collections import defaultdict
 
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, redirect, render_template, request, url_for
 
 from foreman.r3_extension import Repository
-
 
 job_tree = Blueprint("job_tree", __name__, url_prefix='/tree')
 
@@ -100,7 +99,7 @@ def relocate():
 
     jobs = repository.find({ "path": { "$glob": f"{source}/*" } })
     for job in jobs:
-        job.r3_job.metadata["path"] = f"{destination}/{job.virtual_path[len(source) + 1:]}"
+        job.r3_job.metadata["path"] = f"{destination}/{job.virtual_path[len(source) + 1:]}"  # noqa: E501
         affected_jobs.append(job)
 
     conflicts = set()

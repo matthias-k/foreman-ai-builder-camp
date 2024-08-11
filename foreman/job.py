@@ -6,11 +6,11 @@ Displays information about individual jobs.
 import base64
 from datetime import datetime, timedelta
 
+import r3
 from executor import ExternalCommandFailed
 from executor.ssh.client import RemoteCommand
 from flask import Blueprint, render_template, send_from_directory, url_for
 
-import r3
 from foreman.r3_extension import Repository
 
 SLURM_DATE_FORMAT = r"%Y-%m-%dT%H:%M:%S"

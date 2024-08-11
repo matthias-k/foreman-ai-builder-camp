@@ -33,6 +33,7 @@ packages = ["foreman"]
 
 [[tool.mypy.overrides]]
 module = [
+    "diskcache.*",
     "executor.*",
     "tensorboard.*",
 ]

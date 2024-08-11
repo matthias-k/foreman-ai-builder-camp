@@ -31,7 +31,7 @@ class Slurm:
 
         if cache_experiation > 0:
             memoize = CACHE.memoize(expire=cache_experiation)
-            self._get_jobs_from_host = memoize(self._get_jobs_from_host)
+            self._get_jobs_from_host = memoize(self._get_jobs_from_host)  # type: ignore
 
     @property
     def cache_experation(self) -> int:

@@ -7,7 +7,6 @@ from flask import Blueprint, render_template
 
 from foreman.r3_extension import Repository
 
-
 job_list = Blueprint("job_list", __name__, url_prefix="/list")
 
 

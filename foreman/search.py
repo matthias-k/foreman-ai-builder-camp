@@ -5,7 +5,6 @@ from flask import Blueprint, render_template, request
 
 from foreman.r3_extension import Repository
 
-
 search = Blueprint("search", __name__, url_prefix="/search")
 
 
