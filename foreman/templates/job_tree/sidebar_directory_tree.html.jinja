@@ -1,10 +1,18 @@
 
 <ul>
     {%- for name, directory in directory_tree.items() recursive %}
-    <li class="">
-        <a href="{{ url_for('job_tree.view', path=directory.path) }}" class="underline text-sky-600 hover:no-underline hover:text-sky-400">{{ name }}</a>
+    <li class="leading-8">
         {%- if directory.children %}
-        <ul class="pl-4 border-l-2 border-solid border-gray-400">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="inline-block w-4 h-4 me-1 align-text-bottom">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+        </svg><a href="{{ url_for('job_tree.view', path=directory.path) }}" class="text-medium hover:text-sky-400">{{ name }}</a>
+        {%- else %}
+        <a href="{{ url_for('job_tree.view', path=directory.path) }}" class="ml-5 text-medium hover:text-sky-400">{{ name }}</a>
+        {%- endif %}
+
+
+        {%- if directory.children %}
+        <ul class="pl-2">
             {{ loop(directory.children.items()) }}
         </ul>
         {%- endif %}
