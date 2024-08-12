@@ -57,6 +57,30 @@ def view(path):
     )
 
 
+@job_tree.route("/directory_tree")
+def directory_tree():
+    repository = Repository.from_environment()
+    jobs = repository.find({ "path": { "$glob": "*/*" } })
+    directories = sorted(job.virtual_path.rsplit("/", 1)[0] for job in jobs)
+
+    directory_tree = dict()
+    for directory in directories:
+        parts = directory.split("/")
+        current = directory_tree
+        for part in parts:
+            if part not in current:
+                current[part] = {
+                    "path": "/".join(parts[:parts.index(part) + 1]),
+                    "children": {},
+                }
+            current = current[part]["children"]
+
+    return render_template(
+        "job_tree/sidebar_directory_tree.html.jinja",
+        directory_tree=directory_tree,
+    )
+
+
 @job_tree.route("/view_revisions/<path:path>")
 def view_revisions(path: str):
     repository = Repository.from_environment()

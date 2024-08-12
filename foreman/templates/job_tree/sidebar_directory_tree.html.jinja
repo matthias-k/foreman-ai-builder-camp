@@ -1,0 +1,13 @@
+
+<ul>
+    {%- for name, directory in directory_tree.items() recursive %}
+    <li class="">
+        <a href="{{ url_for('job_tree.view', path=directory.path) }}" class="underline text-sky-600 hover:no-underline hover:text-sky-400">{{ name }}</a>
+        {%- if directory.children %}
+        <ul class="pl-4 border-l-2 border-solid border-gray-400">
+            {{ loop(directory.children.items()) }}
+        </ul>
+        {%- endif %}
+    </li>
+    {%- endfor %}
+</ul>

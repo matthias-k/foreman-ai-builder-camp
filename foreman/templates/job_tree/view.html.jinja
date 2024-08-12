@@ -1,5 +1,9 @@
 {% extends "base.html.jinja" %}
 
+{% block sidebar %}
+{% include "job_tree/sidebar.html.jinja" %}
+{% endblock %}
+
 {% block contents %}
 <nav aria-label="breadcrumb" class="mb-4">
     <ol class="flex flex-row text-gray-600 text-sm">
