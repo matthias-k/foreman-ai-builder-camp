@@ -1,11 +1,16 @@
 
-<ul>
+<ul id="directory-tree">
     {%- for name, directory in directory_tree.items() recursive %}
     <li class="leading-8">
         {%- if directory.children %}
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="inline-block w-4 h-4 me-1 align-text-bottom">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-        </svg><a href="{{ url_for('job_tree.view', path=directory.path) }}" class="text-medium hover:text-sky-400">{{ name }}</a>
+        <button class="hover:text-sky-400" onclick="toggle(this);">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="inline-block w-4 h-4 me-1 align-text-bottom icon-chevron-right">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="inline-block w-4 h-4 me-1 align-text-bottom icon-chevron-down">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+            </svg>
+        </button><a href="{{ url_for('job_tree.view', path=directory.path) }}" class="text-medium hover:text-sky-400">{{ name }}</a>
         {%- else %}
         <a href="{{ url_for('job_tree.view', path=directory.path) }}" class="ml-5 text-medium hover:text-sky-400">{{ name }}</a>
         {%- endif %}
@@ -19,3 +24,29 @@
     </li>
     {%- endfor %}
 </ul>
+
+<script>
+    document.querySelectorAll('#directory-tree ul').forEach(function(ul) {
+        ul.style.display = 'none';
+    });
+
+    document.querySelectorAll('#directory-tree .icon-chevron-down').forEach(function(chevronDown) {
+        chevronDown.style.display = 'none';
+    });
+
+    function toggle(button) {
+        var li = button.parentElement;
+        var ul = li.querySelector('ul');
+        var chevronRight = li.querySelector('.icon-chevron-right');
+        var chevronDown = li.querySelector('.icon-chevron-down');
+        if (ul.style.display === 'none') {
+            ul.style.display = 'block';
+            chevronRight.style.display = 'none';
+            chevronDown.style.display = 'inline-block';
+        } else {
+            ul.style.display = 'none';
+            chevronRight.style.display = 'inline-block';
+            chevronDown.style.display = 'none';
+        }
+    }
+</script>
