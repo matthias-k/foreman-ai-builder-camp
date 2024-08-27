@@ -48,12 +48,45 @@ def view(path):
             full_path += name + "/"
             breadcrumbs[name] = full_path
 
+    if request.headers.get("Hx-Target", "root") == "root":
+        return render_template(
+            "job_tree/view.html.jinja",
+            breadcrumbs=breadcrumbs,
+            jobs=jobs,
+            directories=directories,
+            path=path,
+        )
+    else:
+        return render_template(
+            "job_tree/contents.html.jinja",
+            breadcrumbs=breadcrumbs,
+            jobs=jobs,
+            directories=directories,
+            path=path,
+        )
+
+
+@job_tree.route("/directory_tree")
+def directory_tree():
+    repository = Repository.from_environment()
+    jobs = repository.find({ "path": { "$glob": "*/*" } })
+    directories = sorted(job.virtual_path.rsplit("/", 1)[0] for job in jobs)
+
+    directory_tree = dict()
+    for directory in directories:
+        parts = directory.split("/")
+        current = directory_tree
+        for part in parts:
+            if part not in current:
+                current[part] = {
+                    "path": "/".join(parts[:parts.index(part) + 1]),
+                    "children": {},
+                }
+            current = current[part]["children"]
+
     return render_template(
-        "job_tree/view.html.jinja",
-        breadcrumbs=breadcrumbs,
-        jobs=jobs,
-        directories=directories,
-        path=path,
+        "job_tree/sidebar_directory_tree.html.jinja",
+        directory_tree=directory_tree,
     )
 
 
