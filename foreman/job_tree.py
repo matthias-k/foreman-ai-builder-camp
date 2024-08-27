@@ -48,13 +48,22 @@ def view(path):
             full_path += name + "/"
             breadcrumbs[name] = full_path
 
-    return render_template(
-        "job_tree/view.html.jinja",
-        breadcrumbs=breadcrumbs,
-        jobs=jobs,
-        directories=directories,
-        path=path,
-    )
+    if request.headers.get("Hx-Target", "root") == "root":
+        return render_template(
+            "job_tree/view.html.jinja",
+            breadcrumbs=breadcrumbs,
+            jobs=jobs,
+            directories=directories,
+            path=path,
+        )
+    else:
+        return render_template(
+            "job_tree/contents.html.jinja",
+            breadcrumbs=breadcrumbs,
+            jobs=jobs,
+            directories=directories,
+            path=path,
+        )
 
 
 @job_tree.route("/directory_tree")
