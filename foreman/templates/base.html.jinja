@@ -35,13 +35,20 @@
             </ul>
         </nav>
 
-        <main class="flex flex-row flex-1 overflow-y-auto bg-white">
+        <main id="main" class="flex flex-row flex-1 overflow-y-auto bg-white">
             {% block sidebar %}{% endblock %}
             <div id="contents" class="{% if self.sidebar() %}sm:ml-64{% endif %} flex-1 px-4 py-4 overflow-y-auto">
                 {% block contents %}{% endblock %}       
             </div>
         </main>
     </div>
+
+    <div id="modal" class="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-50 hidden"></div>
+    <script>
+        function showModal() {
+            document.getElementById('modal').classList.remove('hidden');
+        }
+    </script>
 </body>
 
 </html>

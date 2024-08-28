@@ -1,4 +1,4 @@
-<form class="w-full -m-1" action="{{ url_for('job_tree.relocate') }}" method="post">
+<form class="w-full -m-1" hx-post="{{ url_for('job_tree.relocate') }}">
     <input type="hidden" name="source" value="{{ path }}">
 
     <input id="relocate-form-name" type="text" name="destination" value="{{ path }}"

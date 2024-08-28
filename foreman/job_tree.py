@@ -5,7 +5,7 @@ using this virtual directory structure.
 """
 from collections import defaultdict
 
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import Blueprint, make_response, redirect, render_template, request, url_for
 
 from foreman.r3_extension import Repository
 
@@ -144,17 +144,21 @@ def relocate():
                 conflicts.add(job.r3_job.metadata["path"])
 
         if len(conflicts) > 0 and not merge_confirmed:
-            return render_template(
+            response = make_response(render_template(
                 "job_tree/relocate_confirm_merge.html.jinja",
                 source=source,
                 destination=destination,
                 conflicts=sorted(conflicts),
                 redirect_to=redirect_to,
-            )
+            ))
+            response.headers["HX-Retarget"] = "#modal"
+            return response
 
     for job in affected_jobs:
         job.r3_job.save_metadata()
         repository.r3_repository._index.remove(job.r3_job)
         repository.r3_repository._index.add(job.r3_job)
 
-    return redirect(url_for("job_tree.view", path=redirect_to))
+    response = make_response("")
+    response.headers["HX-Redirect"] = url_for("job_tree.view", path=redirect_to)
+    return response
