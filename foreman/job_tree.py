@@ -135,21 +135,22 @@ def relocate():
         job.r3_job.metadata["path"] = f"{destination}/{job.virtual_path[len(source) + 1:]}"  # noqa: E501
         affected_jobs.append(job)
 
-    conflicts = set()
-    for job in affected_jobs:
-        if repository.find({ "path": job.r3_job.metadata["path"] }):
-            conflicts.add(job.r3_job.metadata["path"])
-
     redirect_to = "" if "/" not in source else source.rsplit("/", 1)[0]
 
-    if len(conflicts) > 0 and not merge_confirmed:
-        return render_template(
-            "job_tree/relocate_confirm_merge.html.jinja",
-            source=source,
-            destination=destination,
-            conflicts=conflicts,
-            redirect_to=redirect_to,
-        )
+    if not merge_confirmed:
+        conflicts = set()
+        for job in affected_jobs:
+            if repository.find({ "path": job.r3_job.metadata["path"] }):
+                conflicts.add(job.r3_job.metadata["path"])
+
+        if len(conflicts) > 0 and not merge_confirmed:
+            return render_template(
+                "job_tree/relocate_confirm_merge.html.jinja",
+                source=source,
+                destination=destination,
+                conflicts=sorted(conflicts),
+                redirect_to=redirect_to,
+            )
 
     for job in affected_jobs:
         job.r3_job.save_metadata()
