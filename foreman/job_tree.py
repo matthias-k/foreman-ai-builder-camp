@@ -110,13 +110,13 @@ def view_revisions(path: str):
     )
 
 
-@job_tree.route("/relocate_form/<path:path>")
-def relocate_form(path):
-    return render_template("job_tree/relocate_form.html.jinja", path=path)
+@job_tree.route("/move_form/<path:path>")
+def move_form(path):
+    return render_template("job_tree/move_form.html.jinja", path=path)
 
 
-@job_tree.route("/relocate", methods=["POST"])
-def relocate():
+@job_tree.route("/move", methods=["POST"])
+def move():
     source = request.form["source"]
     destination = request.form["destination"]
     merge_confirmed = request.form.get("merge_confirmed", False)
@@ -145,7 +145,7 @@ def relocate():
 
         if len(conflicts) > 0 and not merge_confirmed:
             response = make_response(render_template(
-                "job_tree/relocate_confirm_merge.html.jinja",
+                "job_tree/move_confirm_merge.html.jinja",
                 source=source,
                 destination=destination,
                 conflicts=sorted(conflicts),

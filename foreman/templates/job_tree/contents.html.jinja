@@ -52,7 +52,7 @@
             <td></td>
             <td>
                 <button
-                    hx-get="{{ url_for('job_tree.relocate_form', path=path) }}"
+                    hx-get="{{ url_for('job_tree.move_form', path=path) }}"
                     hx-target="#folder-{{ loop.index }}"
                     hx-swap="innerHTML"
                     class="underline text-sky-600 hover:no-underline hover:text-sky-400 group-hover/item:visible">
@@ -82,7 +82,7 @@
             <td class="px-6 py-4" hx-get="{{ url_for('job.status', id=entry[0].id) }}" hx-trigger="every 2s"></td>
             <td class="px-6 py-4 whitespace-nowrap">
                 <button
-                    hx-get="{{ url_for('job_tree.relocate_form', path=entry[0].virtual_path) }}"
+                    hx-get="{{ url_for('job_tree.move_form', path=entry[0].virtual_path) }}"
                     hx-target="#name-{{ entry[0].id }}"
                     hx-swap="innerHTML"
                     class="underline text-sky-600 hover:no-underline hover:text-sky-400 group-hover/item:visible">
