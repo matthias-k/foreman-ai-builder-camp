@@ -1,7 +1,7 @@
-<form class="w-full -m-1" action="{{ url_for('job_tree.relocate') }}" method="post">
+<form class="w-full -m-1" hx-post="{{ url_for('job_tree.move') }}">
     <input type="hidden" name="source" value="{{ path }}">
 
-    <input id="relocate-form-name" type="text" name="destination" value="{{ path }}"
+    <input id="move-form-name" type="text" name="destination" value="{{ path }}"
            class="w-3/5 p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
 
     <button type="submit" class="ml-4 hover:text-green-600">
@@ -19,6 +19,6 @@
     </button>
 
     <script>
-        document.getElementById('relocate-form-name').select().focus();
+        document.getElementById('move-form-name').select().focus();
     </script>
 </form>
