@@ -6,4 +6,67 @@
 
 {% block contents %}
 {% include "job_tree/contents.html.jinja" %}
+
+<script>
+    function dragstartHandler(event) {
+        console.log('dragstart', event.target.dataset.path);
+        event.dataTransfer.setData('text/plain', event.target.dataset.path);
+        event.dataTransfer.dropEffect = "move";
+    }
+
+    function dragoverHandler(event) {
+        event.preventDefault();
+        const target = event.target.closest('[data-droppable]');
+        target.classList.add('border-2', 'border-sky-500');
+    }
+
+    function dragleaveHandler(event) {
+        const target = event.target.closest('[data-droppable]');
+        target.classList.remove('border-2', 'border-sky-500');
+    }
+
+    function dropHandler(event) {
+        const target = event.target.closest('[data-droppable]');
+
+        const source = event.dataTransfer.getData('text/plain');
+        const name = source.split('/').pop();
+
+        let destination;
+        if (target.dataset.path == '/') {
+            destination = name;
+        } else if (target.dataset.path.endsWith('/')) {
+            destination = target.dataset.path + name;
+        } else {
+            destination = target.dataset.path + '/' + name;
+        }
+
+        console.log('drop', source, destination);
+        console.log(event);
+
+        data = new FormData();
+        data.append('source', source);
+        data.append('destination', destination);
+
+        htmx.ajax('POST', '{{ url_for("job_tree.move") }}', { "values": data });
+    }
+
+    function initDragAndDrop() {
+        document.querySelectorAll('[draggable]').forEach(function (element) {
+            if (element.dataset.path !== undefined) {
+                element.addEventListener('dragstart', dragstartHandler);
+            }
+        });
+
+        document.querySelectorAll('[data-droppable]').forEach(function (element) {
+            if (element.dataset.path !== undefined) {
+                element.addEventListener('dragover', dragoverHandler);
+                element.addEventListener('dragleave', dragleaveHandler);
+                element.addEventListener('drop', dropHandler);
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initDragAndDrop);
+    document.addEventListener('htmx:load', initDragAndDrop);
+</script>
 {% endblock %}
