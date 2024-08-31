@@ -16,6 +16,13 @@
 
     function dragoverHandler(event) {
         event.preventDefault();
+        const target = event.target.closest('[data-droppable]');
+        target.classList.add('border-2', 'border-sky-500');
+    }
+
+    function dragleaveHandler(event) {
+        const target = event.target.closest('[data-droppable]');
+        target.classList.remove('border-2', 'border-sky-500');
     }
 
     function dropHandler(event) {
@@ -53,6 +60,7 @@
         document.querySelectorAll('[data-droppable]').forEach(function (element) {
             if (element.dataset.path !== undefined) {
                 element.addEventListener('dragover', dragoverHandler);
+                element.addEventListener('dragleave', dragleaveHandler);
                 element.addEventListener('drop', dropHandler);
             }
         });
