@@ -83,13 +83,14 @@ def view_file(id: str, path: str = ""):
     if path.endswith(".html"):
         return render_template(
             "job/file_website.html.jinja",
-            content_path=url_for("job.file_contents", path=path),
+            content_path=url_for("job.file_contents", path=f"{id}/{path}"),
             uuid=id,
             path=str(path).replace("/", " / "),
         )
 
     known_extensions = {
         "csv": "csv",
+        "json": "json",
         "log": "log",
         "md": "markdown",
         "py": "python",
@@ -129,7 +130,7 @@ def file_contents(path):
 
 def _get_job_timeline(job: r3.Job):
     starttime = (job.timestamp.date() - timedelta(days=1)).isoformat()
- 
+
     events_by_slurm_job = dict()
 
     for host in ["slurm2", "galvani"]:
@@ -169,7 +170,7 @@ def _get_job_timeline(job: r3.Job):
                         "datetime": datetime.strptime(end, SLURM_DATE_FORMAT),
                         "reason": "preempted",
                     })
-                
+
                 elif state == "COMPLETED":
                     events_by_slurm_job[job_id].append({
                         "status": "running",
@@ -181,7 +182,7 @@ def _get_job_timeline(job: r3.Job):
                         "datetime": datetime.strptime(end, SLURM_DATE_FORMAT),
                         "reason": "",
                     })
-                
+
                 elif state == "RUNNING":
                     events_by_slurm_job[job_id].append({
                         "status": "running",
@@ -204,7 +205,7 @@ def _get_job_timeline(job: r3.Job):
                 "reason": event["reason"],
                 "slurm_job_id": slurm_job_id,
             })
-    
+
     # Add durations
     for i in range(len(timeline) - 1):
         timeline[i]["duration"] = timeline[i + 1]["datetime"] - timeline[i]["datetime"]
