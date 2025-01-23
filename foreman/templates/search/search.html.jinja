@@ -4,8 +4,13 @@
 <h1>Search</h1>
 
 <form hx-post="{{ url_for('search.search_post') }}" hx-target="#search-results">
+    <label for="format">Format:</label>
+    <select id="format" name="format" class="border-2">
+        <option value="json">JSON</option>
+        <option value="yaml">YAML</option>
+    </select>
     <textarea id="query" name="query" class="border-2" cols="160" rows="10">{
-    
+
 }</textarea>
     <button type="submit">Search</button>
 </form>

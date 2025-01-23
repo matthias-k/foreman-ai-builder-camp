@@ -13,6 +13,7 @@ dependencies = [
     "executor~=23.2",
     "flask~=3.0",
     "pandas~=2.2",
+    "PyYAML~=6.0",
     "tensorboard~=2.16",
 ]
 dynamic = ["version"]

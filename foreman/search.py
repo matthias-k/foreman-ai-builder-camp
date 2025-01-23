@@ -2,6 +2,7 @@
 import json
 
 from flask import Blueprint, render_template, request
+from yaml import safe_load
 
 from foreman.r3_extension import Repository
 
@@ -16,10 +17,20 @@ def index():
 @search.route("/search", methods=["POST"])
 def search_post():
     query_str = request.form["query"]
-    try:
-        query = json.loads(query_str)
-    except json.JSONDecodeError as error:
-        return f"Invalid query: {query_str}, {error}"
+    query_format = request.form['format']
+
+    if query_format == 'json':
+        try:
+            query = json.loads(query_str)
+        except json.JSONDecodeError as error:
+            return f"Invalid query: {query_str}, {error}"
+    elif query_format == 'yaml':
+        try:
+            query = safe_load(query_str)
+        except Exception as error:
+            return f"Invalid query: {query_str}, {error}"
+    else:
+        return f"Invalid format: {query_format}"
 
     repository = Repository.from_environment()
     jobs = sorted(repository.find(query), key=lambda job: job.timestamp, reverse=True)
