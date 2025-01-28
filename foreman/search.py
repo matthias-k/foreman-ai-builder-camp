@@ -1,8 +1,8 @@
 """Job search blueprint."""
 import json
 
+import yaml
 from flask import Blueprint, render_template, request
-from yaml import safe_load
 
 from foreman.r3_extension import Repository
 
@@ -26,8 +26,8 @@ def search_post():
             return f"Invalid query: {query_str}, {error}"
     elif query_format == 'yaml':
         try:
-            query = safe_load(query_str)
-        except Exception as error:
+            query = yaml.safe_load(query_str)
+        except yaml.YAMLError as error:
             return f"Invalid query: {query_str}, {error}"
     else:
         return f"Invalid format: {query_format}"
