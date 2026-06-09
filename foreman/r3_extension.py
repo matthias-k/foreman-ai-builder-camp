@@ -57,6 +57,11 @@ class Job:
         """Returns the tags of this job."""
         return self.r3_job.metadata.get("tags", [])
 
+    @property
+    def has_report(self) -> bool:
+        """Returns whether this job has a report.html in its output."""
+        return (self.path / "output" / "report.html").exists()
+
     def _get_status(self) -> str:
         if (self.path / "output" / "done").exists():
             with open(self.path / "output" / "done") as file:

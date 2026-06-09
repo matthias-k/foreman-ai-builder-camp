@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 import r3
 from executor import ExternalCommandFailed
 from executor.ssh.client import RemoteCommand
-from flask import Blueprint, render_template, send_from_directory, url_for
+from flask import Blueprint, render_template, request, send_from_directory, url_for
 
 from foreman.r3_extension import Repository
 
@@ -23,7 +23,8 @@ def view(id: str):
     repository = Repository.from_environment()
     job = repository.get(id)
     timeline = _get_job_timeline(job.r3_job)
-    return render_template("job/view.html.jinja", job=job, timeline=timeline)
+    open_file = request.args.get("file")
+    return render_template("job/view.html.jinja", job=job, timeline=timeline, open_file=open_file)
 
 
 @job.route("/status/<id>")
