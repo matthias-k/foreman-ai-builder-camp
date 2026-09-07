@@ -93,6 +93,7 @@ def view_file(id: str, path: str = ""):
         "json": "json",
         "log": "log",
         "md": "markdown",
+        "qmd": "markdown",
         "py": "python",
         "sh": "shell",
         "yaml": "yaml",
