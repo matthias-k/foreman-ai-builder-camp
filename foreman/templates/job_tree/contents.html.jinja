@@ -104,7 +104,7 @@
                 <button type="button" class="underline text-sky-600 hover:no-underline hover:text-sky-400"
                     onclick="navigator.clipboard.writeText('{{ entry[0].path }}')">Copy Path</button>
 
-                <a href="/tensorboard/open/{{ uuid }}" target="_blank"
+                <a href="/tensorboard/open/{{ entry[0].id }}" target="_blank"
                     class="underline text-sky-600 hover:no-underline hover:text-sky-400">Tensorboard</a>
             </td>
         </tr>
