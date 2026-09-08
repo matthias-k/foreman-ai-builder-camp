@@ -31,6 +31,8 @@ app.register_blueprint(search)
 joint_app = DispatcherMiddleware(app)
 
 app.config.from_object("foreman.config")
+# Optional machine-specific overrides in foreman/config_local.py (gitignored).
+app.config.from_pyfile("config_local.py", silent=True)
 
 
 @click.command()
