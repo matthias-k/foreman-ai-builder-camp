@@ -7,6 +7,9 @@
 {% endblock %}
 
 {% block contents %}
+{% if open_file %}
+<div hx-get="{{ url_for('job.view_file', id=job.id, path=open_file) }}" hx-target="#contents" hx-trigger="load" hx-swap="innerHTML"></div>
+{% else %}
 <nav aria-label="breadcrumb">
     <ol class="flex flex-row text-gray-600 text-sm">
         <li><a href="/" class="underline text-sky-600 hover:no-underline hover:text-sky-400">Jobs</a>&nbsp;/&nbsp;</li>
@@ -107,4 +110,5 @@
       </tbody>
   </table>
 </div>
+{% endif %}
 {% endblock %}

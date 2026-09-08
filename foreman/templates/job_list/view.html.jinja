@@ -29,6 +29,10 @@
                     onclick="navigator.clipboard.writeText('{{ job.path }}')">Copy Path</button>
                 <a href="/tensorboard/open/{{ job.id }}" target="_blank"
                     class="underline text-sky-600 hover:no-underline hover:text-sky-400">Tensorboard</a>
+                {% if job.has_report %}
+                <a href="{{ url_for('job.view', id=job.id, file='/output/report.html') }}" target="_blank"
+                    class="underline text-sky-600 hover:no-underline hover:text-sky-400">Report</a>
+                {% endif %}
             </td>
         </tr>
         {% endfor %}
