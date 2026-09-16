@@ -10,16 +10,21 @@ authors = [
 ]
 dependencies = [
     "click~=8.1",
+    "diskcache~=5.6",
     "executor~=23.2",
     "flask~=3.0",
     "pandas~=2.2",
     "tensorboard~=2.16",
+    "werkzeug~=3.0",
 ]
 dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = [
-    "ruff~=0.3"
+    "mypy~=1.9",
+    "pytest~=8.2",
+    "pytest-cov~=5.0",
+    "ruff~=0.3",
 ]
 
 [project.scripts]
@@ -33,6 +38,7 @@ packages = ["foreman"]
 
 [[tool.mypy.overrides]]
 module = [
+    "diskcache.*",
     "executor.*",
     "tensorboard.*",
 ]
