@@ -1,0 +1,15 @@
+<h1 class="text-xl font-bold mb-4">Dependencies of {{ job.virtual_path or job.id }}</h1>
+
+<section class="mb-8">
+    <h2 class="text-lg font-semibold mb-2">Depends on</h2>
+    <div id="upstream-deps"
+         hx-get="{{ url_for('job.dependencies_upstream', id=job.id) }}"
+         hx-trigger="load" hx-swap="innerHTML"></div>
+</section>
+
+<section>
+    <h2 class="text-lg font-semibold mb-2">Depended on by</h2>
+    <div id="downstream-deps"
+         hx-get="{{ url_for('job.dependencies_downstream', id=job.id) }}"
+         hx-trigger="load" hx-swap="innerHTML"></div>
+</section>

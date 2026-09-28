@@ -1,0 +1,19 @@
+{% import "macros.html.jinja" as macros %}
+
+<div class="mb-2 text-sm">
+    <span class="text-gray-600 dark:text-gray-400">{{ jobs|length }} job(s)</span>
+    &nbsp;
+    <a hx-get="{{ url_for('job.dependencies_' ~ direction, id=job.id, recursive='false') }}"
+       hx-target="#{{ direction }}-deps" hx-swap="innerHTML"
+       class="underline cursor-pointer {{ 'font-bold' if not recursive else 'text-sky-600' }}">direct</a>
+    |
+    <a hx-get="{{ url_for('job.dependencies_' ~ direction, id=job.id, recursive='true') }}"
+       hx-target="#{{ direction }}-deps" hx-swap="innerHTML"
+       class="underline cursor-pointer {{ 'font-bold' if recursive else 'text-sky-600' }}">recursive</a>
+</div>
+
+{% if jobs %}
+{{ macros.jobs_table(jobs, table_id=table_id) }}
+{% else %}
+<p class="text-gray-500 dark:text-gray-400">None</p>
+{% endif %}

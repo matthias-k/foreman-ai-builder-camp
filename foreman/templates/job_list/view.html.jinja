@@ -3,47 +3,5 @@
 {% import "macros.html.jinja" as macros %}
 
 {% block contents %}
-<table id="jobs" class="table-auto">
-    <thead>
-        <tr>
-            <th>UUID</th>
-            <th>Date</th>
-            <th>Status</th>
-            <th>Tags</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        {% for job in jobs %}
-        <tr>
-            <td class="font-monospace"><a href="{{ url_for('job.view', id=job.id) }}" class="underline text-sky-600 hover:no-underline hover:text-sky-400">{{ job.id }}</a></td>
-            <td class="font-monospace">{{ job.timestamp.strftime("%Y-%m-%d %H:%M:%S") }}</td>
-            <td>{{ macros.status(job.status) }}</td>
-            <td>
-                {% if job.virtual_path %}<strong>{{ job.virtual_path }}</strong><br>{% endif %}
-                {% for tag in job.tags %}#{{ tag }} {% endfor %}
-            </td>
-            <td>
-                <button type="button" class="underline text-sky-600 hover:no-underline hover:text-sky-400"
-                    onclick="navigator.clipboard.writeText('{{ job.path }}')">Copy Path</button>
-                <a href="/tensorboard/open/{{ job.id }}" target="_blank"
-                    class="underline text-sky-600 hover:no-underline hover:text-sky-400">Tensorboard</a>
-                {% if job.has_report %}
-                <a href="{{ url_for('job.view', id=job.id, file='/output/report.html') }}" target="_blank"
-                    class="underline text-sky-600 hover:no-underline hover:text-sky-400">Report</a>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<script>
-    $(document).ready(function () {
-        $('#jobs').DataTable({
-            "order": [[1, 'desc']],
-        });
-    });
-</script>
+{{ macros.jobs_table(jobs) }}
 {% endblock %}

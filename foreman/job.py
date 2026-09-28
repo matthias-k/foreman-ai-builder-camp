@@ -27,6 +27,39 @@ def view(id: str):
     return render_template("job/view.html.jinja", job=job, timeline=timeline, open_file=open_file)
 
 
+@job.route("/view/<id>/dependencies")
+def dependencies(id: str):
+    repository = Repository.from_environment()
+    job = repository.get(id)
+    return render_template("job/dependencies.html.jinja", job=job)
+
+
+@job.route("/view/<id>/dependencies/upstream")
+def dependencies_upstream(id: str):
+    repository = Repository.from_environment()
+    job = repository.get(id)
+    recursive = request.args.get("recursive") == "true"
+    jobs = repository.find_dependencies(job, recursive=recursive)
+    return render_template(
+        "job/_dependency_list.html.jinja",
+        job=job, jobs=jobs, direction="upstream",
+        recursive=recursive, table_id="deps-upstream",
+    )
+
+
+@job.route("/view/<id>/dependencies/downstream")
+def dependencies_downstream(id: str):
+    repository = Repository.from_environment()
+    job = repository.get(id)
+    recursive = request.args.get("recursive") == "true"
+    jobs = repository.find_dependents(job, recursive=recursive)
+    return render_template(
+        "job/_dependency_list.html.jinja",
+        job=job, jobs=jobs, direction="downstream",
+        recursive=recursive, table_id="deps-downstream",
+    )
+
+
 @job.route("/status/<id>")
 def status(id: str):
     repository = Repository.from_environment()
